@@ -1,3 +1,4 @@
+
 sudo apt update -y
 if [ $(sudo dpkg --status apache2 | grep -c "ok installed" ) -eq 0 ];
 then
