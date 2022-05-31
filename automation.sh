@@ -26,8 +26,30 @@ fi
 
 tar -cf jaipal-httpd-logs-$(date '+%d%m%Y-%H%M%S').tar -C /var/log/apache2 access.log error.log
 
-mv jaipal-httpd-logs-$(date '+%d%m%Y-%H%M%S').tar /tmp
+cp  jaipal-httpd-logs-$(date '+%d%m%Y-%H%M%S').tar /tmp
 
 aws s3 cp /tmp/jaipal-httpd-logs-$(date '+%d%m%Y-%H%M%S').tar \
 s3://upgrad-jaipal
+
+if [  -f "/var/www/html/inventory.html" ];
+then
+        echo "file found"
+else
+        echo "file not found"
+        touch /var/www/html/inventory.html
+        echo "Log Type	Time Created	Type	Size" >> /var/www/html/inventory.html
+
+fi
+ls -lh jaipal-httpd-logs* | awk '{print $5}'
+lgtyp='httpd-logs'
+typ='tar'
+echo $lgtyp$'\t'$(date "+%d%m%Y-%H%M%S")$'\t'$typ$'\t'$(ls -lh jaipal-httpd-logs* | awk '{print $5}') >> /var/www/html/inventory.html
+rm jaipal-httpd-logs*
+if [ -f "/etc/cron.d/automation" ];
+then
+	continue
+else
+	touch /etc/cron.d/automation
+	printf "0 0 * * * root /root/Automation_Project/auotmation.sh" > /etc/cron.d/automation
+fi
 
